@@ -12,5 +12,7 @@ RSpec.configure do |config|
     Survey.all.each { |survey| survey.destroy }
     Question.all.each { |question| question.destroy }
     Answer.all.each { |answer| answer.destroy }
+    User.all.each { |user| user.destroy }
+    Response.all.each { |response| response.destroy }
   end
 end

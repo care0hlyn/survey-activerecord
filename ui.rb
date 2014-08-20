@@ -57,12 +57,15 @@ def survey_menu
 end
 
 def take_survey
+  header
   list_surveys
   puts "Enter # to take survey."
   @current_survey = Survey.find_by(id: gets.chomp.to_i)
-
+  header
+  puts "Taking Survey: #{@current_survey.name}"
+  whitespace
   @current_survey.questions.each do |question|
-    puts "#{question.text}"
+    puts "#{question.text}?"
     whitespace
     puts "Choices:"
     question.answers.each do |answer|
