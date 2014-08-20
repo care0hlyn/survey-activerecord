@@ -20,9 +20,9 @@ def menu
   header
   puts "Main Menu"
   whitespace
-  puts " '1' to go to user menu."
-  puts " '2' to go to survey menu."
-  puts " '3' to exit program."
+  puts " '1' User menu."
+  puts " '2' Survey menu."
+  puts " '3' Exit program."
   case gets.chomp
   when '1'
     user_menu
@@ -38,11 +38,11 @@ end
 
 def user_menu
   header
-  puts " '1' to create new user."
-  puts " '2' to delete user."
-  puts " '3' to update user."
-  puts " '4' to view users."
-  puts " '5' to go to main menu."
+  puts " '1' Create new user."
+  puts " '2' Delete user."
+  puts " '3' Update user."
+  puts " '4' View users."
+  puts " '5' Main menu."
   case gets.chomp
   when '1'
     create_user
@@ -75,7 +75,15 @@ def delete_user
 end
 
 def update_user
-
+  header
+  view_users
+  puts "Enter # of user to update."
+  user = User.find_by(id: gets.chomp.to_i)
+  puts "Enter a new name for the user:"
+  user.update(name: gets.chomp)
+  puts "#{user.name} has been updated!"
+  sleep 0.5
+  user_menu
 end
 
 def view_users
@@ -88,15 +96,19 @@ def view_users
 end
 
 def survey_menu
-  puts " '1' to take a survey."
-  puts " '2' to manage surveys."
-  puts " '3' to go to main menu."
+  header
+  puts " '1' Take a survey."
+  puts " '2' Manage surveys."
+  puts " '3' View results."
+  puts " '4' Main menu."
   case gets.chomp
   when '1'
     take_survey
   when '2'
-    survey_menu
+    manage_surveys
   when '3'
+    view_results
+  when '4'
     menu
   else
     puts 'Invalid.'
@@ -104,14 +116,43 @@ def survey_menu
   end
 end
 
-def survey_menu
+def view_results
   header
-  puts "Survey Menu"
+  list_surveys
+  puts "Enter survey # to view results:"
+  @current_survey = Survey.find_by(id: gets.chomp.to_i)
+
+  header
+  puts "Viewing Survey: #{@current_survey.name}"
+  whitespace
+  total = 0.0
+  count = 0.0
+  # percentage = (answers.length / questions.length)*100
+
+  @current_survey.questions.each do |question|
+    total += question.responses.length
+    puts "#{question.id}) #{question.text}"
+    puts "Number of Responses = #{total}"
+    puts "Answers:"
+    question.answers.each do |answer|
+      count += answer.responses.length
+      percentage = (count/total * 100).to_i
+      puts "#{answer.text}" + " | " + "Picked: #{count.to_i}, #{percentage}%"
+      count = 0.0
+    end
+  whitespace
+  total = 0.0
+  end
+end
+
+def manage_surveys
+  header
+  puts "Manage Surveys"
   whitespace
   puts " '1' Create a new survey."
   puts " '2' Edit a survey."
   puts " '3' Delete a survey."
-  puts " '4' Return to main menu."
+  puts " '4' Main menu."
   case gets.chomp
   when '1'
     create_survey
@@ -126,11 +167,17 @@ end
 
 def take_survey
   header
+  view_users
+  puts "Enter # choose a user:"
+  @current_user = User.find_by(id: gets.chomp.to_i)
+
+  header
   list_surveys
   puts "Enter # to take survey."
   @current_survey = Survey.find_by(id: gets.chomp.to_i)
+
   header
-  puts "Taking Survey: #{@current_survey.name}"
+  puts " #{@current_user.name} is taking Survey: #{@current_survey.name}"
   whitespace
   @current_survey.questions.each do |question|
     puts "#{question.text}?"
@@ -141,8 +188,9 @@ def take_survey
     end
     whitespace
     puts "Enter the number of your choice:"
-    response = gets.chomp.to_i
+    Response.create(survey_id: @current_survey.id, user_id: @current_user.id, question_id: question.id, answer_id: gets.chomp.to_i)
   end
+  survey_menu
 end
 
 def create_survey
@@ -152,7 +200,7 @@ def create_survey
   puts "Enter the topic of the survey:"
   topic = gets.chomp
   Survey.create(name: name, topic: topic)
-  survey_menu
+  manage_surveys
 end
 
 def edit_survey
@@ -174,7 +222,7 @@ def view_survey
   puts " '1' Add a new question."
   puts " '2' Edit a question"
   puts " '3' Delete a question."
-  puts " '4' Return to Surveys Menu."
+  puts " '4' Manage Surveys."
   case gets.chomp
   when '1'
     create_question
@@ -183,7 +231,7 @@ def view_survey
   when '3'
     delete_question
   when '4'
-    survey_menu
+    manage_surveys
   end
 end
 
@@ -201,7 +249,7 @@ def delete_survey
   puts "Enter # to remove survey from list."
   survey = Survey.find_by(id: gets.chomp.to_i)
   survey.destroy
-  survey_menu
+  manage_surveys
 end
 
 def delete_question
@@ -209,7 +257,7 @@ def delete_question
   puts "Enter # to remove question from list."
   question = Question.find_by(id: gets.chomp.to_i)
   question.destroy
-  survey_menu
+  manage_surveys
 end
 
 def delete_answer
@@ -242,14 +290,14 @@ def view_question
   list_answers
   puts " '1' Add a new answer."
   puts " '2' Delete an answer"
-  puts " '3' Return to Survey Menu."
+  puts " '3' Manage Surveys."
   case gets.chomp
   when '1'
     create_answer
   when '2'
     delete_answer
   when '3'
-    survey_menu
+    manage_surveys
   end
 end
 
