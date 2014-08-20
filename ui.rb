@@ -20,16 +20,84 @@ def menu
   header
   puts "Main Menu"
   whitespace
+  puts " '1' to go to user menu."
+  puts " '2' to go to survey menu."
+  puts " '3' to exit program."
+  case gets.chomp
+  when '1'
+    user_menu
+  when '2'
+    survey_menu
+  when '3'
+    exit
+  else
+    puts 'Invalid.'
+    menu
+  end
+end
+
+def user_menu
+  header
+  puts " '1' to create new user."
+  puts " '2' to delete user."
+  puts " '3' to update user."
+  puts " '4' to view users."
+  puts " '5' to go to main menu."
+  case gets.chomp
+  when '1'
+    create_user
+  when '2'
+    delete_user
+  when '3'
+    update_user
+  when '4'
+    view_users
+  when '5'
+    menu
+  end
+end
+
+def create_user
+  header
+  puts "Enter user name:"
+  user = User.create(name: gets.chomp)
+  puts "#{user.name} has been added."
+  user_menu
+end
+
+def delete_user
+  header
+  view_users
+  puts "Enter # of user to delete."
+  user = User.find_by(id: gets.chomp.to_i)
+  user.destroy
+  user_menu
+end
+
+def update_user
+
+end
+
+def view_users
+  puts "Users"
+  puts "------"
+  User.all.each do |user|
+    puts user.id.to_s + " - " + user.name
+  end
+  whitespace
+end
+
+def survey_menu
   puts " '1' to take a survey."
   puts " '2' to manage surveys."
-  puts " '3' to exit program."
+  puts " '3' to go to main menu."
   case gets.chomp
   when '1'
     take_survey
   when '2'
     survey_menu
   when '3'
-    exit
+    menu
   else
     puts 'Invalid.'
     menu
