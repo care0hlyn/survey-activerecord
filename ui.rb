@@ -56,6 +56,24 @@ def survey_menu
   end
 end
 
+def take_survey
+  list_surveys
+  puts "Enter # to take survey."
+  @current_survey = Survey.find_by(id: gets.chomp.to_i)
+
+  @current_survey.questions.each do |question|
+    puts "#{question.text}"
+    whitespace
+    puts "Choices:"
+    question.answers.each do |answer|
+      puts "#{answer.id}) #{answer.text} "
+    end
+    whitespace
+    puts "Enter the number of your choice:"
+    response = gets.chomp.to_i
+  end
+end
+
 def create_survey
   header
   puts "Enter the name of the survey:"
