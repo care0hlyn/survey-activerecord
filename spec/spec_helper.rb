@@ -8,11 +8,13 @@ ActiveRecord::Base.establish_connection(test_configuration)
 
 require 'survey'
 require 'question'
+require 'answer'
 
 RSpec.configure do |config|
   config.formatter = 'doc'
   config.before(:each) do
     Survey.all.each { |survey| survey.destroy }
     Question.all.each { |question| question.destroy }
+    Answer.all.each { |answer| answer.destroy }
   end
 end
